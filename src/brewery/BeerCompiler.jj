@@ -1,5 +1,161 @@
-/**
- * JavaCC template file created by SF JavaCC plugin 1.5.28+ wizard for JavaCC 1.5.0+
- */options{  static = true;}PARSER_BEGIN(BeerCompiler)package brewery;
+options
+{
+  static = true;
+}
 
-public class BeerCompiler{  public static void main(String args []) throws ParseException  {    BeerCompiler parser = new BeerCompiler(System.in);    while (true)    {      System.out.println("Reading from standard input...");      System.out.print("Enter an expression like \"1+(2+3)*4;\" :");      try      {        switch (BeerCompiler.one_line())        {          case 0 :           System.out.println("OK.");          break;          case 1 :           System.out.println("Goodbye.");          break;          default :           break;        }      }      catch (Exception e)      {        System.out.println("NOK.");        System.out.println(e.getMessage());        BeerCompiler.ReInit(System.in);      }      catch (Error e)      {        System.out.println("Oops.");        System.out.println(e.getMessage());        break;      }    }  }}PARSER_END(BeerCompiler)SKIP :{  " "| "\r"| "\t"| "\n"}TOKEN : /* OPERATORS */{  < PLUS : "+" >| < MINUS : "-" >| < MULTIPLY : "*" >| < DIVIDE : "/" >}TOKEN :{  < CONSTANT : (< DIGIT >)+ >| < #DIGIT : [ "0"-"9" ] >}int one_line() :{}{  sum() ";"  {    return 0;  }| ";"  {    return 1;  }}void sum() :{}{  term()  (    (      < PLUS >    | < MINUS >    )    term()  )*}void term() :{}{  unary()  (    (      < MULTIPLY >    | < DIVIDE >    )    unary()  )*}void unary() :{}{  < MINUS > element()| element()}void element() :{}{  < CONSTANT >| "(" sum() ")"}
+PARSER_BEGIN(BeerCompiler)
+package brewery;
+
+public class BeerCompiler
+{
+  public static void main(String args []) throws ParseException
+  {
+    BeerCompiler parser = new BeerCompiler(System.in);
+    while (true)
+    {
+      System.out.println("A cervejaria esta aberta:");
+      try
+      {
+        parser.comandos();
+      }
+      catch (Exception e)
+      {
+        System.out.println("Vamos beber:");
+        System.out.println(e.getMessage());
+        BeerCompiler.ReInit(System.in);
+      }
+      catch (Error e)
+      {
+        System.out.println("Parando de beber...");
+        System.out.println(e.getMessage());
+        break;
+      }
+    }
+  }
+}
+
+PARSER_END(BeerCompiler)
+
+SKIP :
+{
+  " "
+| "\r"
+| "\t"
+| "\n"
+}
+
+TOKEN : /* OPERATORS */
+{
+  < INICIOPROGRAMA: 		"geladeiraAberta" 					>
+| < FIMPROGRAMA:			"geladeiraVazia" 					>
+| < INICIOBLOCO:			"{" 								>
+| < FIMBLOCO: 				"}"									>
+| < PONTOVIRGULA:			";" 								>
+| < INTEIRO: 				"pilsen" 							>
+| < REAL: 					"malzbier" 							>
+| < BOOLEAN:				"lager" 							>
+| < LETRA: 					"ipa" 								>
+| < STRING:					"helles"							>
+| < DECIMAL:				(< DIGITO >)+ 						>
+| < ID:						"breja_"(<CARACTERE>|<DIGITO>)*		>
+| < DIGITO:					["0"-"9"] 							>
+| < CARACTERE:				(["A"-"Z"] | ["a"-"z"]) 			>
+| < ATRIBUICAO:				"=" 								>
+| < SEPARADOR:				"," 								>
+| < IF:						"garrafa" 							>
+| < ELSE:					"lata" 								>
+| < PARESQ: 				"(" 								>
+| < ISTRING:				"'" 								>
+| < PARDIR:					")" 								>
+| < CASADECIMAL:			"." 								>
+| < OPERADOR_LOGICO: 		"<" | ">" | "==" | "&" | "|" 		>
+| < OPERADOR_ARITMETICO: 	"+" | "-" | "*" | "/" 				>
+| < FOR:					"rodizio" 							>
+| < FUNC:					"chop_"(<CARACTERE>|<DIGITO>)*		>
+| < WHILE:					"rodada"							>
+| < INTERRUPCAO:			"chegaPorHoje"						>
+| < TRUE:					"cervejaGelada" 					>
+| < FALSE:					"cervejaQuente" 					>
+}
+
+int main():
+{}
+{
+<INICIOPROGRAMA> <INICIOBLOCO>
+
+(comandos())*
+
+<FIMBLOCO> <FIMPROGRAMA>
+}
+void comandos():
+{ }
+{
+	declaracaoVariavel() | condicional() | repeticao() | function()
+}
+
+void declaracaoVariavel():
+{ }
+{
+	tipoDado() <ID> <PONTOVIRGULA>
+}
+
+void tipoDado():
+{ }
+{
+	<REAL> | <INTEIRO> | <LETRA> | <STRING> |<BOOLEAN> 	
+}
+
+float numero():
+{ }
+{
+	(<DIGITO>)+ (<CASADECIMAL> (<DIGITO>)+ )?
+}
+
+void expressao():
+{ }
+{
+  ((numero() | <ID>) (<OPERADOR_LOGICO> | <OPERADOR_ARITMETICO>) (numero() | <ID>))
+}
+
+char condicional():
+{ }
+{
+	<IF> <PARESQ> expressao() <PARDIR> <INICIOBLOCO> (declaracaoVariavel() | repeticao())* <FIMBLOCO>(<ELSE><INICIOBLOCO> (declaracaoVariavel() | repeticao())* <FIMBLOCO>)?
+}
+
+void repeticao():
+{ }
+{
+	(<FOR> <PARESQ> (numero()|<ID>) <PARDIR> (<INICIOBLOCO>(comandos())* <FIMBLOCO>)?)
+|	(<WHILE> <PARESQ> (expressao())? <PARDIR> <INICIOBLOCO> (comandos())*<FIMBLOCO>)
+}
+
+void function():
+{}
+{
+  <FUNC> <PARESQ> ((<ID> | dado()) (<SEPARADOR> (<ID> | dado()))+) <PARDIR> <PONTOVIRGULA>
+}
+
+void espressao():
+{ }
+{
+ 	((numero() | <ID>) (<OPERADOR_LOGICO> | <OPERADOR_ARITMETICO>) (numero() | <ID>))
+}
+
+char string():
+{ }
+{
+	(<ISTRING>)(<CARACTERE> | <DIGITO>)*(<ISTRING>)
+}
+
+int bool():
+{ }
+{
+	<TRUE> | <FALSE>
+}
+
+int dado():
+{ }
+{
+	numero() | string() | bool()
+}
