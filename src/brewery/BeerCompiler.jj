@@ -1,6 +1,51 @@
-options{  static = true;}PARSER_BEGIN(BeerCompiler)package brewery;
+options
+{
+  static = true;
+}
 
-public class BeerCompiler{  public static void main(String args []) throws ParseException  {    BeerCompiler parser = new BeerCompiler(System.in);    while (true)    {      System.out.println("A cervejaria esta aberta:");      try      {        parser.main();      }      catch (Exception e)      {        System.out.println("Vamos beber:");        System.out.println(e.getMessage());        BeerCompiler.ReInit(System.in);      }      catch (Error e)      {        System.out.println("Parando de beber...");        System.out.println(e.getMessage());        break;      }    }  }}PARSER_END(BeerCompiler)SKIP :{  " "| "\r"| "\t"| "\n"| "//"}TOKEN : /* OPERATORS */{
+PARSER_BEGIN(BeerCompiler)
+package brewery;
+
+public class BeerCompiler
+{
+  public static void main(String args []) throws ParseException
+  {
+    BeerCompiler parser = new BeerCompiler(System.in);
+    while (true)
+    {
+      System.out.println("A cervejaria esta aberta:");
+      try
+      {
+        parser.comandos();
+      }
+      catch (Exception e)
+      {
+        System.out.println("Vamos beber:");
+        System.out.println(e.getMessage());
+        BeerCompiler.ReInit(System.in);
+      }
+      catch (Error e)
+      {
+        System.out.println("Parando de beber...");
+        System.out.println(e.getMessage());
+        break;
+      }
+    }
+  }
+}
+
+PARSER_END(BeerCompiler)
+
+SKIP :
+{
+  " "
+| "\r"
+| "\t"
+| "\n"
+}
+
+TOKEN : /* OPERATORS */
+{
   < INICIOPROGRAMA: 		"geladeiraAberta" 					>
 | < FIMPROGRAMA:			"geladeiraVazia" 					>
 | < INICIOBLOCO:			"{" 								>
@@ -10,27 +55,30 @@ public class BeerCompiler{  public static void main(String args []) throws Par
 | < REAL: 					"malzbier" 							>
 | < BOOLEAN:				"lager" 							>
 | < LETRA: 					"ipa" 								>
-| < STRING:					"helles"							>| < ID:						"breja_"(<CARACTERE>|<DIGITO>)*		>
+| < STRING:					"helles"							>
+| < DECIMAL:				(< DIGITO >)+ 						>
+| < ID:						"breja_"(<CARACTERE>|<DIGITO>)*		>
 | < DIGITO:					["0"-"9"] 							>
 | < CARACTERE:				(["A"-"Z"] | ["a"-"z"]) 			>
 | < ATRIBUICAO:				"=" 								>
 | < SEPARADOR:				"," 								>
-| < IF:						"garrafa" 							> 
+| < IF:						"garrafa" 							>
 | < ELSE:					"lata" 								>
 | < PARESQ: 				"(" 								>
 | < ISTRING:				"'" 								>
 | < PARDIR:					")" 								>
-| < CASADECIMAL:			"." 								> 
+| < CASADECIMAL:			"." 								>
 | < OPERADOR_LOGICO: 		"<" | ">" | "==" | "&" | "|" 		>
-| < OPERADOR_ARITMETICO: 	"+" | "-" | "*" | "/" 				> 
-| < FOR:					"rodizio" 							> 
+| < OPERADOR_ARITMETICO: 	"+" | "-" | "*" | "/" 				>
+| < FOR:					"rodizio" 							>
 | < FUNC:					"chop_"(<CARACTERE>|<DIGITO>)*		>
 | < WHILE:					"rodada"							>
 | < INTERRUPCAO:			"chegaPorHoje"						>
-| < TRUE:					"cervejaGelada" 					> 
-| < FALSE:					"cervejaQuente" 					> }
+| < TRUE:					"cervejaGelada" 					>
+| < FALSE:					"cervejaQuente" 					>
+}
 
-void main():
+int main():
 {}
 {
 <INICIOPROGRAMA> <INICIOBLOCO>
@@ -42,25 +90,22 @@ void main():
 void comandos():
 { }
 {
-	declaracaoVariavel()
-|   condicional()  
-| 	repeticao()
-| 	function() 
+	declaracaoVariavel() | condicional() | repeticao() | function()
 }
 
 void declaracaoVariavel():
 { }
 {
-	tipoDado() <ID> (<ATRIBUICAO> ( <CARACTERE>| numero() ) )? (<SEPARADOR> <ID> (<ATRIBUICAO> ( <CARACTERE>| numero()) )?)* <PONTOVIRGULA>
+	tipoDado() <ID> <PONTOVIRGULA>
 }
 
 void tipoDado():
 { }
 {
-	<REAL> | <INTEIRO> | <LETRA> | <STRING> | <BOOLEAN> 	
+	<REAL> | <INTEIRO> | <LETRA> | <STRING> |<BOOLEAN> 	
 }
 
-void numero():
+float numero():
 { }
 {
 	(<DIGITO>)+ (<CASADECIMAL> (<DIGITO>)+ )?
@@ -72,10 +117,10 @@ void expressao():
   ((numero() | <ID>) (<OPERADOR_LOGICO> | <OPERADOR_ARITMETICO>) (numero() | <ID>))
 }
 
-void condicional():
+char condicional():
 { }
 {
-	<IF> <PARESQ> expressao() <PARDIR> <INICIOBLOCO> (bool() | declaracaoVariavel() | repeticao())* <FIMBLOCO>(<ELSE><INICIOBLOCO> (declaracaoVariavel() | repeticao())* <FIMBLOCO>)?
+	<IF> <PARESQ> expressao() <PARDIR> <INICIOBLOCO> (declaracaoVariavel() | repeticao())* <FIMBLOCO>(<ELSE><INICIOBLOCO> (declaracaoVariavel() | repeticao())* <FIMBLOCO>)?
 }
 
 void repeticao():
@@ -97,20 +142,20 @@ void espressao():
  	((numero() | <ID>) (<OPERADOR_LOGICO> | <OPERADOR_ARITMETICO>) (numero() | <ID>))
 }
 
-void string():
+char string():
 { }
 {
 	(<ISTRING>)(<CARACTERE> | <DIGITO>)*(<ISTRING>)
 }
 
-void bool():
+int bool():
 { }
 {
 	<TRUE> | <FALSE>
 }
 
-void dado():
+int dado():
 { }
 {
 	numero() | string() | bool()
-}
+}
