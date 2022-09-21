@@ -1,6 +1,52 @@
-options{  static = true;}PARSER_BEGIN(BeerCompiler)package brewery;
+options
+{
+  static = true;
+}
 
-public class BeerCompiler{  public static void main(String args []) throws ParseException  {    BeerCompiler parser = new BeerCompiler(System.in);    while (true)    {      System.out.println("A cervejaria esta aberta:");      try      {        parser.main();      }      catch (Exception e)      {        System.out.println("Vamos beber:");        System.out.println(e.getMessage());        BeerCompiler.ReInit(System.in);      }      catch (Error e)      {        System.out.println("Parando de beber...");        System.out.println(e.getMessage());        break;      }    }  }}PARSER_END(BeerCompiler)SKIP :{  " "| "\r"| "\t"| "\n"| "//"}TOKEN : /* OPERATORS */{
+PARSER_BEGIN(BeerCompiler)
+package brewery;
+
+public class BeerCompiler
+{
+  public static void main(String args []) throws ParseException
+  {
+    BeerCompiler parser = new BeerCompiler(System.in);
+    while (true)
+    {
+      System.out.println("A cervejaria esta aberta:");
+      try
+      {
+        parser.main();
+      }
+      catch (Exception e)
+      {
+        System.out.println("Vamos beber:");
+        System.out.println(e.getMessage());
+        BeerCompiler.ReInit(System.in);
+      }
+      catch (Error e)
+      {
+        System.out.println("Parando de beber...");
+        System.out.println(e.getMessage());
+        break;
+      }
+    }
+  }
+}
+
+PARSER_END(BeerCompiler)
+
+SKIP :
+{
+  " "
+| "\r"
+| "\t"
+| "\n"
+| "//"
+}
+
+TOKEN : /* OPERATORS */
+{
   < INICIOPROGRAMA: 		"geladeiraAberta" 					>
 | < FIMPROGRAMA:			"geladeiraVazia" 					>
 | < INICIOBLOCO:			"{" 								>
@@ -10,7 +56,8 @@ public class BeerCompiler{  public static void main(String args []) throws Par
 | < REAL: 					"malzbier" 							>
 | < BOOLEAN:				"lager" 							>
 | < LETRA: 					"ipa" 								>
-| < STRING:					"helles"							>| < ID:						"breja_"(<CARACTERE>|<DIGITO>)*		>
+| < STRING:					"helles"							>
+| < ID:						"breja_"(<CARACTERE>|<DIGITO>)*		>
 | < DIGITO:					["0"-"9"] 							>
 | < CARACTERE:				(["A"-"Z"] | ["a"-"z"]) 			>
 | < ATRIBUICAO:				"=" 								>
@@ -28,7 +75,8 @@ public class BeerCompiler{  public static void main(String args []) throws Par
 | < WHILE:					"rodada"							>
 | < INTERRUPCAO:			"chegaPorHoje"						>
 | < TRUE:					"cervejaGelada" 					> 
-| < FALSE:					"cervejaQuente" 					> }
+| < FALSE:					"cervejaQuente" 					> 
+}
 
 void main():
 {}
@@ -113,4 +161,4 @@ void dado():
 { }
 {
 	numero() | string() | bool()
-}
+}
