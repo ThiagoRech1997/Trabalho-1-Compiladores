@@ -10,7 +10,7 @@ public class BeerCompiler{  public static void main(String args []) throws Par
 | < REAL: 					"malzbier" 							>
 | < BOOLEAN:				"lager" 							>
 | < LETRA: 					"ipa" 								>
-| < STRING:					"helles"							>| < DECIMAL:				(< DIGITO >)+ 						>| < ID:						"breja_"(<CARACTERE>|<DIGITO>)*		>
+| < STRING:					"helles"							>| < ID:						"breja_"(<CARACTERE>|<DIGITO>)*		>
 | < DIGITO:					["0"-"9"] 							>
 | < CARACTERE:				(["A"-"Z"] | ["a"-"z"]) 			>
 | < ATRIBUICAO:				"=" 								>
