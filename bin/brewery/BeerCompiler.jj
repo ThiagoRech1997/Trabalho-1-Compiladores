@@ -1,5 +1,6 @@
 options
 {
+	LOOKAHEAD = 1;
   static = true;
 }
 
@@ -45,7 +46,7 @@ SKIP :
 | "//"
 }
 
-TOKEN : /* OPERATORS */
+TOKEN :
 {
   < INICIOPROGRAMA: 		"geladeiraAberta" 					>
 | < FIMPROGRAMA:			"geladeiraVazia" 					>
@@ -67,8 +68,7 @@ TOKEN : /* OPERATORS */
 | < PARESQ: 				"(" 								>
 | < ISTRING:				"'" 								>
 | < PARDIR:					")" 								>
-| < CASADECIMAL:			"." 								> 
-| < OPERADOR_LOGICO: 		"<" | ">" | "==" | "&" | "|" 		>
+| < CASADECIMAL:			"." 								>
 | < OPERADOR_ARITMETICO: 	"+" | "-" | "*" | "/" 				> 
 | < FOR:					"rodizio" 							> 
 | < FUNC:					"chop_"(<CARACTERE>|<DIGITO>)*		>
@@ -76,6 +76,20 @@ TOKEN : /* OPERATORS */
 | < INTERRUPCAO:			"chegaPorHoje"						>
 | < TRUE:					"cervejaGelada" 					> 
 | < FALSE:					"cervejaQuente" 					> 
+}
+
+TOKEN : /*OPERADORES*/
+{
+	< MAIOR: 		">" 	>
+|	< MENOR: 		"<" 	>
+|	< MENOR_IGUAL: 	"<=" 	>
+|	< MAIOR_IGUAL: 	">=" 	>
+|	< DIFERENTE: 	"<>" 	>
+| 	< IGUAL:		"==" 	>
+| 	< AND:			"&"		>
+| 	< OR:			"|"		>
+| 	< INCREMENTO: 	"++"	>
+| 	< DECREMENTO:	"--"	>
 }
 
 void main():
@@ -87,13 +101,16 @@ void main():
 
 <FIMBLOCO> <FIMPROGRAMA>
 }
+
 void comandos():
 { }
 {
 	declaracaoVariavel()
 |   condicional()  
 | 	repeticao()
-| 	function() 
+| 	function()
+| 	operacao()
+| 	expressao()
 }
 
 void declaracaoVariavel():
@@ -117,7 +134,13 @@ void numero():
 void expressao():
 { }
 {
-  ((numero() | <ID>) (<OPERADOR_LOGICO> | <OPERADOR_ARITMETICO>) (numero() | <ID>))
+  ((numero() | <ID>) (<MAIOR>|<MENOR>|<MENOR_IGUAL>|<MAIOR_IGUAL>|<DIFERENTE>|<IGUAL>|<AND>|<OR>|<OPERADOR_ARITMETICO>) (numero() | <ID>))
+}
+
+void operacao():
+{ }
+{
+  (<ID>) ( <ATRIBUICAO> ) expressao()
 }
 
 void condicional():
@@ -129,7 +152,7 @@ void condicional():
 void repeticao():
 { }
 {
-	(<FOR> <PARESQ> (numero()|<ID>) <PARDIR> (<INICIOBLOCO>(comandos())* <FIMBLOCO>)?)
+	(<FOR> <PARESQ> ((<ID> <ATRIBUICAO> numero() <PONTOVIRGULA>) (<ID> (<MENOR>|<MAIOR>|<MENOR_IGUAL>|<MAIOR_IGUAL>) numero() <PONTOVIRGULA>)(<ID> (<INCREMENTO>|<DECREMENTO>))) <PARDIR> (<INICIOBLOCO>(comandos())* <FIMBLOCO>)?)
 |	(<WHILE> <PARESQ> (expressao())? <PARDIR> <INICIOBLOCO> (comandos())*<FIMBLOCO>)
 }
 
@@ -137,12 +160,6 @@ void function():
 {}
 {
   <FUNC> <PARESQ> ((<ID> | dado()) (<SEPARADOR> (<ID> | dado()))+) <PARDIR> <PONTOVIRGULA>
-}
-
-void espressao():
-{ }
-{
- 	((numero() | <ID>) (<OPERADOR_LOGICO> | <OPERADOR_ARITMETICO>) (numero() | <ID>))
 }
 
 void string():
