@@ -71,7 +71,7 @@ TOKEN :
 | < FUNC:					"chop_"(<CARACTERE>|<DIGITO>)*		>
 | < WHILE:					"rodada"							>
 | < INTERRUPCAO:			"chegaPorHoje"						>
-| < TRUE:					"cervejaGelada" 					> 
+| < TRUE:					"cervejaGelada" 					>
 | < FALSE:					"cervejaQuente" 					>
 }
 
@@ -106,18 +106,17 @@ void comandos():
 |   condicional()  
 | 	repeticao()
 | 	function()
-| 	operacao()
 | 	expressao()
 }
 
 void declaracaoVariavel():
 { }
 {
-	<REAL> <ID> (<ATRIBUICAO> ( numero() ) )? (<SEPARADOR> <ID> (<ATRIBUICAO> ( numero()) )?)* <PONTOVIRGULA>
-| 	<INTEIRO> <ID> (<ATRIBUICAO> ( <DIGITO> )* )? (<SEPARADOR> <ID> (<ATRIBUICAO> ( <DIGITO> )* )?)* <PONTOVIRGULA>
-| 	<CHAR> <ID> (<ATRIBUICAO> ( <CARACTERE> ) )? (<SEPARADOR> <ID> (<ATRIBUICAO> ( <CARACTERE>) )?)* <PONTOVIRGULA>
-| 	<STRING> <ID> (<ATRIBUICAO> ( string() ) )? (<SEPARADOR> <ID> (<ATRIBUICAO> ( string()) )?)* <PONTOVIRGULA>
-| 	<BOOLEAN> <ID> (<ATRIBUICAO> bool())? (<SEPARADOR> <ID> (<ATRIBUICAO> bool())?)* <PONTOVIRGULA>
+	<REAL> 		<ID> (<ATRIBUICAO> ( numero() ))? 		(<SEPARADOR> <ID> (<ATRIBUICAO> ( numero()) )?)* 	<PONTOVIRGULA>
+| 	<INTEIRO> 	<ID> (<ATRIBUICAO> ( <DIGITO> )*)? 		(<SEPARADOR> <ID> (<ATRIBUICAO> ( <DIGITO> )*)?)* 	<PONTOVIRGULA>
+| 	<CHAR> 		<ID> (<ATRIBUICAO> ( <CARACTERE> ))? 	(<SEPARADOR> <ID> (<ATRIBUICAO> ( <CARACTERE>))?)* 	<PONTOVIRGULA>
+| 	<STRING> 	<ID> (<ATRIBUICAO> ( string() ))? 		(<SEPARADOR> <ID> (<ATRIBUICAO> ( string()))?)* 	<PONTOVIRGULA>
+| 	<BOOLEAN> 	<ID> (<ATRIBUICAO> ( bool() ))? 		(<SEPARADOR> <ID> (<ATRIBUICAO> bool())?)* 			<PONTOVIRGULA>
 }
 
 
@@ -133,16 +132,10 @@ void expressao():
   ((numero() | <ID>) (<MAIOR>|<MENOR>|<MENOR_IGUAL>|<MAIOR_IGUAL>|<DIFERENTE>|<IGUAL>|<AND>|<OR>|<OPERADOR_ARITMETICO>) (numero() | <ID>))
 }
 
-void operacao():
-{ }
-{
-  (<ID>) ( <ATRIBUICAO> ) expressao()<PONTOVIRGULA>
-}
-
 void condicional():
 { }
 {
-	<IF> <PARESQ> expressao() <PARDIR> <INICIOBLOCO> (bool() | declaracaoVariavel() | repeticao())* <FIMBLOCO>(<ELSE><INICIOBLOCO> (declaracaoVariavel() | repeticao())* <FIMBLOCO>)?
+	<IF> <PARESQ> expressao() <PARDIR> <INICIOBLOCO> (comandos())* <FIMBLOCO>(<ELSE><INICIOBLOCO> (comandos())* <FIMBLOCO>)?
 }
 
 void repeticao():
