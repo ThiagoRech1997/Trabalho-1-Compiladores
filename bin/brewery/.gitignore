@@ -1,5 +1,4 @@
 /BeerCompilerConstants.java
-/ParseException.java
 /SimpleCharStream.java
 /Token.java
-/TokenMgrError.java
+/BeerCompiler.java

@@ -1,6 +1,7 @@
 options
 {
-	LOOKAHEAD = 1;
+	LOOKAHEAD = 2;
+	//FORCE_LA_CHECK = TRUE;
   static = true;
 }
 
@@ -39,11 +40,7 @@ PARSER_END(BeerCompiler)
 
 SKIP :
 {
-  " "
-| "\r"
-| "\t"
-| "\n"
-| "//"
+  " " | "\r" | "\t" | "\n" | "//"
 }
 
 TOKEN :
