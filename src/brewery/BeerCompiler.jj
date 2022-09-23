@@ -1,7 +1,6 @@
 options
 {
 	LOOKAHEAD = 2;
-	//FORCE_LA_CHECK = TRUE;
   static = true;
 }
 
@@ -13,16 +12,17 @@ public class BeerCompiler
   public static void main(String args []) throws ParseException
   {
     BeerCompiler parser = new BeerCompiler(System.in);
+    System.out.println("A cervejaria esta aberta!");
     while (true)
     {
-      System.out.println("A cervejaria esta aberta:");
+      System.out.println("Vamos beber:");
       try
       {
         parser.main();
       }
       catch (Exception e)
       {
-        System.out.println("Vamos beber:");
+        System.out.println("\n");
         System.out.println(e.getMessage());
         BeerCompiler.ReInit(System.in);
       }
@@ -40,7 +40,7 @@ PARSER_END(BeerCompiler)
 
 SKIP :
 {
-  " " | "\r" | "\t" | "\n" | "//"
+  " " | "\r" | "\t" | "\n"
 }
 
 TOKEN :
@@ -53,7 +53,7 @@ TOKEN :
 | < INTEIRO: 				"pilsen" 							>
 | < REAL: 					"malzbier" 							>
 | < BOOLEAN:				"lager" 							>
-| < LETRA: 					"ipa" 								>
+| < CHAR: 					"ipa" 								>
 | < STRING:					"helles"							>
 | < ID:						"breja_"(<CARACTERE>|<DIGITO>)*		>
 | < DIGITO:					["0"-"9"] 							>
@@ -72,7 +72,7 @@ TOKEN :
 | < WHILE:					"rodada"							>
 | < INTERRUPCAO:			"chegaPorHoje"						>
 | < TRUE:					"cervejaGelada" 					> 
-| < FALSE:					"cervejaQuente" 					> 
+| < FALSE:					"cervejaQuente" 					>
 }
 
 TOKEN : /*OPERADORES*/
@@ -113,14 +113,13 @@ void comandos():
 void declaracaoVariavel():
 { }
 {
-	tipoDado() <ID> (<ATRIBUICAO> ( <CARACTERE>| numero() ) )? (<SEPARADOR> <ID> (<ATRIBUICAO> ( <CARACTERE>| numero()) )?)* <PONTOVIRGULA>
+	<REAL> <ID> (<ATRIBUICAO> ( numero() ) )? (<SEPARADOR> <ID> (<ATRIBUICAO> ( numero()) )?)* <PONTOVIRGULA>
+| 	<INTEIRO> <ID> (<ATRIBUICAO> ( <DIGITO> )* )? (<SEPARADOR> <ID> (<ATRIBUICAO> ( <DIGITO> )* )?)* <PONTOVIRGULA>
+| 	<CHAR> <ID> (<ATRIBUICAO> ( <CARACTERE> ) )? (<SEPARADOR> <ID> (<ATRIBUICAO> ( <CARACTERE>) )?)* <PONTOVIRGULA>
+| 	<STRING> <ID> (<ATRIBUICAO> ( string() ) )? (<SEPARADOR> <ID> (<ATRIBUICAO> ( string()) )?)* <PONTOVIRGULA>
+| 	<BOOLEAN> <ID> (<ATRIBUICAO> bool())? (<SEPARADOR> <ID> (<ATRIBUICAO> bool())?)* <PONTOVIRGULA>
 }
 
-void tipoDado():
-{ }
-{
-	<REAL> | <INTEIRO> | <LETRA> | <STRING> | <BOOLEAN> 	
-}
 
 void numero():
 { }
@@ -137,7 +136,7 @@ void expressao():
 void operacao():
 { }
 {
-  (<ID>) ( <ATRIBUICAO> ) expressao()
+  (<ID>) ( <ATRIBUICAO> ) expressao()<PONTOVIRGULA>
 }
 
 void condicional():
