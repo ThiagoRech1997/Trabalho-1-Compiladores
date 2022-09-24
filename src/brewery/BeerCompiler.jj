@@ -134,14 +134,16 @@ void expressao():
 void condicional():
 { }
 {
-	<IF> <PARESQ> expressao() <PARDIR> <INICIOBLOCO> (comandos())* <FIMBLOCO>(<ELSE><INICIOBLOCO> (comandos())* <FIMBLOCO>)?
+	<IF> <PARESQ> expressao() <PARDIR> <INICIOBLOCO> (comandos())* <FIMBLOCO>
+	(<ELSE><INICIOBLOCO> (comandos())* <FIMBLOCO>)?
 }
 
 void repeticao():
 { }
 {
-	(<FOR> <PARESQ> ((<ID> <ATRIBUICAO> numero() <PONTOVIRGULA>) (<ID> (<MENOR>|<MAIOR>|<MENOR_IGUAL>|<MAIOR_IGUAL>) numero() <PONTOVIRGULA>)(<ID> (<INCREMENTO>|<DECREMENTO>))) <PARDIR> (<INICIOBLOCO>(comandos())* <FIMBLOCO>)?)
-|	(<WHILE> <PARESQ> (expressao())? <PARDIR> <INICIOBLOCO> (comandos())*<FIMBLOCO>)
+	(<FOR> <PARESQ> ((<ID> <ATRIBUICAO> numero() <PONTOVIRGULA>) (<ID> (<MENOR>|<MAIOR>|<MENOR_IGUAL>|<MAIOR_IGUAL>)
+		numero() <PONTOVIRGULA>)(<ID> (<INCREMENTO>|<DECREMENTO>))) <PARDIR> (<INICIOBLOCO>(comandos())* <FIMBLOCO>)?)
+|	(<WHILE> <PARESQ> (expressao())? <PARDIR><INICIOBLOCO> (comandos())*<FIMBLOCO>)
 }
 
 void function():
