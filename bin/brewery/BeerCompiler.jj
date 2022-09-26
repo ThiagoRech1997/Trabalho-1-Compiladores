@@ -107,6 +107,7 @@ void comandos():
 | 	repeticao()
 | 	function()
 | 	expressao()
+| 	operacao()
 }
 
 void declaracaoVariavel():
@@ -168,4 +169,12 @@ void dado():
 { }
 {
 	numero() | string() | bool()
+}
+
+void operacao():
+{}
+{
+	<ID> <ATRIBUICAO> ( <ID> | numero()) <PONTOVIRGULA>
+|   <ID> <ATRIBUICAO> ( <ID> | numero()) <OPERADOR_ARITMETICO> ( <ID> | numero())<PONTOVIRGULA>
+|   <ID> <ATRIBUICAO> <PARESQ> ( <ID> | numero()) <OPERADOR_ARITMETICO> ( <ID> | numero()) <PARDIR> <PONTOVIRGULA>
 }
