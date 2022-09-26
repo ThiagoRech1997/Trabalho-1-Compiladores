@@ -45,48 +45,36 @@ SKIP :
 
 TOKEN :
 {
-  < INICIOPROGRAMA: 		"geladeiraAberta" 					>
-| < FIMPROGRAMA:			"geladeiraVazia" 					>
-| < INICIOBLOCO:			"{" 								>
-| < FIMBLOCO: 				"}"									>
-| < PONTOVIRGULA:			";" 								>
-| < INTEIRO: 				"pilsen" 							>
-| < REAL: 					"malzbier" 							>
-| < BOOLEAN:				"lager" 							>
-| < CHAR: 					"ipa" 								>
-| < STRING:					"helles"							>
-| < ID:						"breja_"(<CARACTERE>|<DIGITO>)*		>
-| < DIGITO:					["0"-"9"] 							>
-| < CARACTERE:				(["A"-"Z"] | ["a"-"z"]) 			>
-| < ATRIBUICAO:				"=" 								>
-| < SEPARADOR:				"," 								>
-| < IF:						"garrafa" 							> 
-| < ELSE:					"lata" 								>
-| < PARESQ: 				"(" 								>
-| < ISTRING:				"'" 								>
-| < PARDIR:					")" 								>
-| < CASADECIMAL:			"." 								>
-| < OPERADOR_ARITMETICO: 	"+" | "-" | "*" | "/" 				> 
-| < FOR:					"rodizio" 							> 
-| < FUNC:					"chop_"(<CARACTERE>|<DIGITO>)*		>
-| < WHILE:					"rodada"							>
-| < INTERRUPCAO:			"chegaPorHoje"						>
-| < TRUE:					"cervejaGelada" 					>
-| < FALSE:					"cervejaQuente" 					>
-}
-
-TOKEN : /*OPERADORES*/
-{
-	< MAIOR: 		">" 	>
-|	< MENOR: 		"<" 	>
-|	< MENOR_IGUAL: 	"<=" 	>
-|	< MAIOR_IGUAL: 	">=" 	>
-|	< DIFERENTE: 	"<>" 	>
-| 	< IGUAL:		"==" 	>
-| 	< AND:			"&"		>
-| 	< OR:			"|"		>
-| 	< INCREMENTO: 	"++"	>
-| 	< DECREMENTO:	"--"	>
+  < INICIOPROGRAMA: 		"geladeiraAberta" 												>
+| < FIMPROGRAMA:			"geladeiraVazia" 												>
+| < INICIOBLOCO:			"{" 															>
+| < FIMBLOCO: 				"}"																>
+| < PONTOVIRGULA:			";" 															>
+| < INTEIRO: 				"pilsen" 														>
+| < REAL: 					"malzbier" 														>
+| < BOOLEAN:				"lager" 														>
+| < CHAR: 					"ipa" 															>
+| < STRING:					"helles"														>
+| < ID:						"breja_"(<CARACTERE>|<DIGITO>)*									>
+| < DIGITO:					["0"-"9"] 														>
+| < CARACTERE:				(["A"-"Z"] | ["a"-"z"]) 										>
+| < ATRIBUICAO:				"=" 															>
+| < SEPARADOR:				"," 															>
+| < IF:						"garrafa" 														> 
+| < ELSE:					"lata" 															>
+| < PARESQ: 				"(" 															>
+| < ISTRING:				"'" 															>
+| < PARDIR:					")" 															>
+| < CASADECIMAL:			"." 															>
+| < OPERADOR_ARITMETICO: 	"+" | "-" | "*" | "/" 											>
+| < OPERADOR_LOGICO:		">" | "<" | "<=" | ">=" | "<>" | "==" | "&" | "|" | "++" | "--"	> 
+| < FOR:					"rodizio" 														>
+| < IN:						"in" 															> 
+| < WHILE:					"rodada"														>
+| < FUNC:					"chop_"(<CARACTERE>|<DIGITO>)*									>
+| < VERDADEIRO:				"cervejaGelada" 												>
+| < FALSO:					"cervejaQuente" 												>
+| < INTERRUPCAO:			"chegaPorHoje"													>
 }
 
 void main():
@@ -105,7 +93,7 @@ void comandos():
 	declaracaoVariavel()
 |   condicional()  
 | 	repeticao()
-| 	function()
+| 	funcao()
 | 	expressao()
 | 	operacao()
 }
@@ -113,11 +101,13 @@ void comandos():
 void declaracaoVariavel():
 { }
 {
-	 	<REAL> 		<ID> (<ATRIBUICAO> ( numero() ))? 		(<SEPARADOR> <ID> (<ATRIBUICAO> ( numero()) )?)* 	<PONTOVIRGULA>
-| 		<INTEIRO> 	<ID> (<ATRIBUICAO> ( <DIGITO> )*)? 		(<SEPARADOR> <ID> (<ATRIBUICAO> ( <DIGITO> )*)?)* 	<PONTOVIRGULA>
-| 		<CHAR> 		<ID> (<ATRIBUICAO> ( <CARACTERE> ))? 	(<SEPARADOR> <ID> (<ATRIBUICAO> ( <CARACTERE>))?)* 	<PONTOVIRGULA>
-| 		<STRING> 	<ID> (<ATRIBUICAO> ( string() ))? 		(<SEPARADOR> <ID> (<ATRIBUICAO> ( string()))?)* 	<PONTOVIRGULA>
-| 		<BOOLEAN> 	<ID> (<ATRIBUICAO> ( bool() ))? 		(<SEPARADOR> <ID> (<ATRIBUICAO> bool())?)* 			<PONTOVIRGULA>
+	tipoDado() <ID> (<ATRIBUICAO> (<CARACTERE>|numero() ))? (<SEPARADOR> <ID> (<ATRIBUICAO> (<CARACTERE>|numero() ))?)* <PONTOVIRGULA>
+}
+
+void tipoDado():
+{}
+{
+  <INTEIRO> | <REAL> | <CHAR> | <STRING> | <BOOLEAN>
 }
 
 void numero():
@@ -129,7 +119,7 @@ void numero():
 void expressao():
 { }
 {
-  ((numero() | <ID>) (<MAIOR>|<MENOR>|<MENOR_IGUAL>|<MAIOR_IGUAL>|<DIFERENTE>|<IGUAL>|<AND>|<OR>|<OPERADOR_ARITMETICO>) (numero() | <ID>))
+  ((numero() | <ID>) (<OPERADOR_LOGICO>|<OPERADOR_ARITMETICO>) (numero() | <ID>))
 }
 
 void condicional():
@@ -142,12 +132,11 @@ void condicional():
 void repeticao():
 { }
 {
-	(<FOR> <PARESQ> ((<ID> <ATRIBUICAO> numero() <PONTOVIRGULA>) (<ID> (<MENOR>|<MAIOR>|<MENOR_IGUAL>|<MAIOR_IGUAL>)
-		numero() <PONTOVIRGULA>)(<ID> (<INCREMENTO>|<DECREMENTO>))) <PARDIR> (<INICIOBLOCO>(comandos())* <FIMBLOCO>)?)
+	(<FOR> <PARESQ> <ID> <IN> <ID> <PARDIR> (<INICIOBLOCO>(comandos())* <FIMBLOCO>)?)
 |	(<WHILE> <PARESQ> (expressao())? <PARDIR><INICIOBLOCO> (comandos())*<FIMBLOCO>)
 }
 
-void function():
+void funcao():
 {}
 {
   <FUNC> <PARESQ> ((<ID> | dado()) (<SEPARADOR> (<ID> | dado()))+) <PARDIR> <PONTOVIRGULA>
@@ -159,22 +148,22 @@ void string():
 	(<ISTRING>)(<CARACTERE> | <DIGITO>)*(<ISTRING>)
 }
 
-void bool():
+void booleano():
 { }
 {
-	<TRUE> | <FALSE>
+	<VERDADEIRO> | <FALSO>
 }
 
 void dado():
 { }
 {
-	numero() | string() | bool()
+	numero() | string() | booleano()
 }
 
 void operacao():
 {}
 {
-	<ID> <ATRIBUICAO> ( <ID> | numero()) <PONTOVIRGULA>
-|   <ID> <ATRIBUICAO> ( <ID> | numero()) <OPERADOR_ARITMETICO> ( <ID> | numero())<PONTOVIRGULA>
-|   <ID> <ATRIBUICAO> <PARESQ> ( <ID> | numero()) <OPERADOR_ARITMETICO> ( <ID> | numero()) <PARDIR> <PONTOVIRGULA>
+	<ID> <ATRIBUICAO> 			( <ID> | numero()) <PONTOVIRGULA>
+|   <ID> <ATRIBUICAO> 			( <ID> | numero()) <OPERADOR_ARITMETICO> ( <ID> | numero())<PONTOVIRGULA>
+|   <ID> <ATRIBUICAO> <PARESQ> 	( <ID> | numero()) <OPERADOR_ARITMETICO> ( <ID> | numero()) <PARDIR> <PONTOVIRGULA>
 }
