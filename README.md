@@ -7,7 +7,7 @@ Este projeto de compilador foi desenvolvido para o primeiro bimestre da discipli
 
 ```
 <principal> ::= <INICIOPROGRAMA> <INICIOBLOCO> (<comandos>)* <FIMBLOCO> <FIMPROGRAMA>
-<INICIOPROGRAMA> > ::= "geladeiraAberta"
+<INICIOPROGRAMA> ::= "geladeiraAberta"
 <FIMPROGRAMA> ::= "geladeiraVazia" 		
 <comandos> ::= <declaracaoVariavel>
 	|  <condicional>  
