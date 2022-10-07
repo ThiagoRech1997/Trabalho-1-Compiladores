@@ -5,8 +5,7 @@ Este projeto de compilador foi desenvolvido para o primeiro bimestre da discipli
 
 ## Forma de Backus-Naur da linguagem desenvolvida
 
-´´´
-
+```
 <principal> ::= <INICIOPROGRAMA> <INICIOBLOCO> (<comandos>)* <FIMBLOCO> <FIMPROGRAMA>
 <INICIOPROGRAMA> > ::= "geladeiraAberta"
 <FIMPROGRAMA> ::= "geladeiraVazia" 		
@@ -23,7 +22,7 @@ Este projeto de compilador foi desenvolvido para o primeiro bimestre da discipli
 <declaracaoVariavel> ::= <tipoDado> <ID> (<ATRIBUICAO> ( <CARACTERE>| <numero> ) )? (<SEPARADOR> <ID> (<ATRIBUICAO> ( <CARACTERE>| <numero>))?)* <PONTOVIRGULA>
 <expressao> ::= ((<numero> | <ID>) (<OPERADOR_LOGICO> | <OPERADOR_ARITMETICO> ) (<numero> | <ID>))
 <operacao> ::= (<ID>) ( <ATRIBUICAO> ) (<ID>|<numero>) <PONTOVIRGULA>
-  | <ID> <ATRIBUICAO> 			( <ID> | <numero>) <OPERADOR_ARITMETICO> ( <ID> | <numero>)<PONTOVIRGULA>
+  | <ID> <ATRIBUICAO> ( <ID> | <numero>) <OPERADOR_ARITMETICO> ( <ID> | <numero>)<PONTOVIRGULA>
   | <ID> <ATRIBUICAO> <PARESQ> 	( <ID> | <numero>) <OPERADOR_ARITMETICO> ( <ID> | <numero>) <PARDIR> <PONTOVIRGULA>
 <tipoDado> ::= <REAL> | <INTEIRO> | <LETRA> | <STRING> | <BOOLEAN>
 <bool> ::= <TRUE> | <FALSE>
@@ -56,8 +55,6 @@ Este projeto de compilador foi desenvolvido para o primeiro bimestre da discipli
 <ISTRING> ::= "'" 				
 <PARDIR> ::= ")" 				
 <CASADECIMAL> ::= "." 			 
-<OPERADOR_LOGICO> ::= ">" | "<" | "<=" | ">=" | "<>" | "==" | "&" 
-						  | "|" | "++" | "--"
+<OPERADOR_LOGICO> ::= ">" | "<" | "<=" | ">=" | "<>" | "==" | "&" | "|" | "++" | "--"
 <OPERADOR_ARITMETICO> ::= "+" | "-" | "*" | "/" 
-
-´´´
+```
