@@ -58,3 +58,13 @@ Este projeto de compilador foi desenvolvido para o primeiro bimestre da discipli
 <OPERADOR_LOGICO> ::= ">" | "<" | "<=" | ">=" | "<>" | "==" | "&" | "|" | "++" | "--"
 <OPERADOR_ARITMETICO> ::= "+" | "-" | "*" | "/" 
 ```
+## Exemplo de programa aceito pelo compilador
+
+```
+geladeiraAberta{
+	pilsen breja_var = 100;
+	rodada (breja_var > 10){
+		breja_var = 1;
+	}
+}geladeiraFechada
+```
