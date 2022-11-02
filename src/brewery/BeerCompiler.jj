@@ -103,8 +103,8 @@ void repeticao():
 	(<FOR> <PARESQ>
 		<ID > (< ATRIBUICAO > <DIGITO >(< DIGITO >)*)* < PONTOVIRGULA > 
 		<ID > <OPERADOR_LOGICO > (<ID >|<DIGITO >(< DIGITO >)*) < PONTOVIRGULA >
-		<ID > < ATRIBUICAO > <ID > <OPERADOR_ARITMETICO > (<ID >|<DIGITO>(< DIGITO >)*) <PARDIR>
-		<INICIOBLOCO>(comandos())*<FIMBLOCO>)
+		<ID > < ATRIBUICAO > <ID > <OPERADOR_ARITMETICO > (<ID >|<DIGITO>(< DIGITO >)*) 
+		<PARDIR><INICIOBLOCO>(comandos())*<FIMBLOCO>)
 |	(<WHILE> <PARESQ>(expressao()) <PARDIR> <INICIOBLOCO>(comandos())*<FIMBLOCO>)
 }
 
