@@ -1,11 +1,5 @@
-options
-{
-	LOOKAHEAD = 2;
-  static = true;
-}
-
 PARSER_BEGIN(BeerCompiler)
-package brewery;
+//package brewery;
 
 public class BeerCompiler
 {
@@ -55,10 +49,7 @@ TOKEN :
 | < BOOLEAN:				"lager" 														>
 | < CHAR: 					"ipa" 															>
 | < STRING:					"helles"														>
-| < ID:						"breja_"(<CARACTERE>|<DIGITO>)*									>
-| < DIGITO:					["0"-"9"] 														>
-| < CARACTERE:				(["A"-"Z"] | ["a"-"z"]) 										>
-| < ATRIBUICAO:				"=" 															>
+| < ATRIBUICAO:				"=" 												     		>
 | < SEPARADOR:				"," 															>
 | < IF:						"garrafa" 														> 
 | < ELSE:					"lata" 															>
@@ -75,14 +66,17 @@ TOKEN :
 | < VERDADEIRO:				"cervejaGelada" 												>
 | < FALSO:					"cervejaQuente" 												>
 | < INTERRUPCAO:			"chegaPorHoje"													>
+| < ID:						<CARACTERE>(["_"]|<CARACTERE >|<DIGITO>)*                       >
+| < DIGITO:					["0"-"9"] 														>
+| < CARACTERE:				(["A"-"Z"] | ["a"-"z"]) 										>
 }
 
 void main():
-{}
+{ }
 {
 <INICIOPROGRAMA> <INICIOBLOCO>
 
-(comandos())*
+	(comandos())*
 
 <FIMBLOCO> <FIMPROGRAMA>
 }
@@ -91,55 +85,70 @@ void comandos():
 { }
 {
 	declaracaoVariavel()
-|   condicional()  
+|   	condicional()  
 | 	repeticao()
 | 	funcao()
-| 	expressao()
 | 	operacao()
+}
+
+void condicional():
+{ }
+{
+	<IF> <PARESQ> expressao() <PARDIR> <INICIOBLOCO> (comandos())* <FIMBLOCO> (<ELSE><INICIOBLOCO> (comandos())* <FIMBLOCO>)?
+}
+
+void repeticao():
+{ }
+{
+	(<FOR> <PARESQ>
+		<ID > (< ATRIBUICAO > <DIGITO >(< DIGITO >)*)* < PONTOVIRGULA > 
+		<ID > <OPERADOR_LOGICO > (<ID >|<DIGITO >(< DIGITO >)*) < PONTOVIRGULA >
+		<ID > < ATRIBUICAO > <ID > <OPERADOR_ARITMETICO > (<ID >|<DIGITO>(< DIGITO >)*) <PARDIR>
+		<INICIOBLOCO>(comandos())*<FIMBLOCO>)
+|	(<WHILE> <PARESQ>(expressao()) <PARDIR> <INICIOBLOCO>(comandos())*<FIMBLOCO>)
+}
+
+void funcao():
+{ }
+{
+	<FUNC> <PARESQ> ((<ID> | dado()) (<SEPARADOR> (<ID> | dado()))+) <PARDIR> <PONTOVIRGULA>
+}
+
+void operacao():
+{ }
+{
+	<ID> <ATRIBUICAO> expressao() <PONTOVIRGULA> 
+}
+
+void expressao():
+{ }
+{
+	(<ID> | dado()) ((<OPERADOR_LOGICO>|<OPERADOR_ARITMETICO>) (<ID> | dado()))*
+| 	<PARESQ> expressao () <PARDIR>
 }
 
 void declaracaoVariavel():
 { }
 {
-	tipoDado() <ID> (<ATRIBUICAO> (<CARACTERE>|numero() ))? (<SEPARADOR> <ID> (<ATRIBUICAO> (<CARACTERE>|numero() ))?)* <PONTOVIRGULA>
+	tipoDado() <ID> (<ATRIBUICAO> dado())? (<SEPARADOR> (<ATRIBUICAO> dado()))* <PONTOVIRGULA>
 }
 
 void tipoDado():
 {}
 {
-  <INTEIRO> | <REAL> | <CHAR> | <STRING> | <BOOLEAN>
+	<INTEIRO> | <REAL> | <CHAR> | <STRING> | <BOOLEAN>
+}
+
+void dado():
+{ }
+{
+	numero() | string() | booleano()
 }
 
 void numero():
 { }
 {
 	(<DIGITO>)+ (<CASADECIMAL> (<DIGITO>)+ )?
-}
-
-void expressao():
-{ }
-{
-  ((numero() | <ID>) (<OPERADOR_LOGICO>|<OPERADOR_ARITMETICO>) (numero() | <ID>))
-}
-
-void condicional():
-{ }
-{
-	<IF> <PARESQ> expressao() <PARDIR> <INICIOBLOCO> (comandos())* <FIMBLOCO>
-	(<ELSE><INICIOBLOCO> (comandos())* <FIMBLOCO>)?
-}
-
-void repeticao():
-{ }
-{
-	(<FOR> <PARESQ> <ID> <IN> <ID> <PARDIR> (<INICIOBLOCO>(comandos())* <FIMBLOCO>)?)
-|	(<WHILE> <PARESQ> (expressao())? <PARDIR><INICIOBLOCO> (comandos())*<FIMBLOCO>)
-}
-
-void funcao():
-{}
-{
-  <FUNC> <PARESQ> ((<ID> | dado()) (<SEPARADOR> (<ID> | dado()))+) <PARDIR> <PONTOVIRGULA>
 }
 
 void string():
@@ -152,18 +161,4 @@ void booleano():
 { }
 {
 	<VERDADEIRO> | <FALSO>
-}
-
-void dado():
-{ }
-{
-	numero() | string() | booleano()
-}
-
-void operacao():
-{}
-{
-	<ID> <ATRIBUICAO> 			( <ID> | numero()) <PONTOVIRGULA>
-|   <ID> <ATRIBUICAO> 			( <ID> | numero()) <OPERADOR_ARITMETICO> ( <ID> | numero())<PONTOVIRGULA>
-|   <ID> <ATRIBUICAO> <PARESQ> 	( <ID> | numero()) <OPERADOR_ARITMETICO> ( <ID> | numero()) <PARDIR> <PONTOVIRGULA>
 }
