@@ -66,5 +66,5 @@ geladeiraAberta{
 	rodada (breja_var > 10){
 		breja_var = 1;
 	}
-}geladeiraFechada
+}geladeiraVazia
 ```
