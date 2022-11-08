@@ -1,5 +1,6 @@
 PARSER_BEGIN(BeerCompiler)
-package brewery;
+package parser;
+import recovery.*;
 
 public class BeerCompiler
 {
@@ -27,6 +28,59 @@ public class BeerCompiler
         break;
       }
     }
+  }
+  
+  static public String im(int x)
+  {
+    int k;
+	String s;
+    s = tokenImage[x];
+    k = s.lastIndexOf("\"");
+    try {
+      s = s.substring(1,k);
+    }
+   catch (StringIndexOutOfBoundsException e)
+	   {}
+   return s;
+  }
+	
+  static Token lastError = null;
+  static boolean eof;    // variável que indica se EOF foi alcançado
+	
+  // o método abaixo consome tokens até alcançar um que pertença ao conjunto
+  // de sincronização
+  static void consumeUntil(RecoverySet g,
+	                 ParseException e,
+	                 String met) throws ParseEOFException,
+	                                    ParseException
+  {
+	Token tok;
+	System.out.println();
+	System.out.println("*** " + met + " ***");
+	System.out.println("     Conjunto de sincronização: " + g);
+		
+	if (g == null) throw e; // se o conjunto é null, propaga a exceção 
+	
+	tok = getToken(1); // pega token corrente
+	while ( ! eof )	{ // se não chegou ao fim do arquivo
+	  if ( g.contains(tok.kind)) {//achou um token no conjunto
+	    System.out.println("     Encontrado token de sincronização: " + 
+	                       im(tok.kind));
+	    break;
+	  }
+	  System.out.println("     Ignorando o token: " + im(tok.kind));
+	  getNextToken();     // pega próximo token       
+      tok = getToken(1);
+	  if (tok.kind == EOF && ! g.contains(EOF) ) // fim da entrada?   
+	      eof = true;
+	}
+    if ( tok != lastError)  {
+	  System.out.println(e.getMessage());
+	  lastError = tok;
+	   
+	}
+	if ( eof )
+	  throw new ParseEOFException("Encontrei EOF onde não deveria.");
   }
 }
 
@@ -72,20 +126,20 @@ TOKEN :
 }
 
 void main():
-{ }
+{}
 {
 <INICIOPROGRAMA> <INICIOBLOCO>
 
 	(comandos())*
 
-<FIMBLOCO> <FIMPROGRAMA>
+<FIMBLOCO> <FIMPROGRAMA> 
 }
 
 void comandos():
 { }
 {
 	declaracaoVariavel()
-|   	condicional()  
+|   condicional()  
 | 	repeticao()
 | 	funcao()
 | 	operacao()
@@ -100,16 +154,17 @@ void condicional():
 void repeticao():
 { }
 {
+	//(<FOR> <PARESQ> <ID> <IN> <ID> <PARDIR> <INICIOBLOCO>(comandos())*<FIMBLOCO>)
 	(<FOR> <PARESQ>
 		<ID > (< ATRIBUICAO > <DIGITO >(< DIGITO >)*)* < PONTOVIRGULA > 
 		<ID > <OPERADOR_LOGICO > (<ID >|<DIGITO >(< DIGITO >)*) < PONTOVIRGULA >
-		<ID > < ATRIBUICAO > <ID > <OPERADOR_ARITMETICO > (<ID >|<DIGITO>(< DIGITO >)*) 
-		<PARDIR><INICIOBLOCO>(comandos())*<FIMBLOCO>)
+		<ID > < ATRIBUICAO > <ID > <OPERADOR_ARITMETICO > (<ID >|<DIGITO>(< DIGITO >)*) <PARDIR>
+		<INICIOBLOCO>(comandos())*<FIMBLOCO>)
 |	(<WHILE> <PARESQ>(expressao()) <PARDIR> <INICIOBLOCO>(comandos())*<FIMBLOCO>)
 }
 
 void funcao():
-{ }
+{}
 {
 	<FUNC> <PARESQ> ((<ID> | dado()) (<SEPARADOR> (<ID> | dado()))+) <PARDIR> <PONTOVIRGULA>
 }
