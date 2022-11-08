@@ -126,94 +126,325 @@ TOKEN :
 }
 
 void main():
-{}
+{ RecoverySet g = Follow.main; }
 {
-<INICIOPROGRAMA> <INICIOBLOCO>
+  try { 
+  inicioPrograma() inicioBloco()
+  
+    (comandos())*
+  
+  fimBloco() fimPrograma()
 
-	(comandos())*
-
-<FIMBLOCO> <FIMPROGRAMA> 
+  } catch(ParseException e) {
+    consumeUntil(g,e,"main");
+  }
+  {return jjtThis; }
 }
 
 void comandos():
-{ }
+{ RecoverySet g = Follow.comandos; }
 {
-	declaracaoVariavel()
-|   condicional()  
-| 	repeticao()
-| 	funcao()
-| 	operacao()
+    try {
+          declaracaoVariavel()
+      |   condicional()  
+      |   repeticao()
+      |   funcao()
+      |   operacao()
+      
+    }catch(ParseException e) {
+    consumeUntil(g,e,"comandos");
+  }
+
 }
 
 void condicional():
-{ }
+{ RecoverySet g = Follow.condicional; }
 {
-	<IF> <PARESQ> expressao() <PARDIR> <INICIOBLOCO> (comandos())* <FIMBLOCO> (<ELSE><INICIOBLOCO> (comandos())* <FIMBLOCO>)?
+  try {
+
+      condicionalIf() paresq() expressao() pardir() inicioBloco() (comandos())* fimBloco() (condicionalElse() inicioBloco() (comandos())* fimBloco())?
+      
+    }catch(ParseException e) {
+    consumeUntil(g,e,"condicional");
+  }
 }
 
 void repeticao():
-{ }
+{ RecoverySet g = Follow.repeticao; }
 {
-	//(<FOR> <PARESQ> <ID> <IN> <ID> <PARDIR> <INICIOBLOCO>(comandos())*<FIMBLOCO>)
-	(<FOR> <PARESQ>
-		<ID > (< ATRIBUICAO > <DIGITO >(< DIGITO >)*)* < PONTOVIRGULA > 
-		<ID > <OPERADOR_LOGICO > (<ID >|<DIGITO >(< DIGITO >)*) < PONTOVIRGULA >
-		<ID > < ATRIBUICAO > <ID > <OPERADOR_ARITMETICO > (<ID >|<DIGITO>(< DIGITO >)*) <PARDIR>
-		<INICIOBLOCO>(comandos())*<FIMBLOCO>)
-|	(<WHILE> <PARESQ>(expressao()) <PARDIR> <INICIOBLOCO>(comandos())*<FIMBLOCO>)
+  //(<FOR> <PARESQ> <ID> <IN> <ID> <PARDIR> <INICIOBLOCO>(comandos())*<FIMBLOCO>)
+
+  try {
+
+    (repFor() paresq()
+      id() (atribuicao() digito()(digito())*)* pontoVirgula() 
+      id() operadorLogico() (id()|digito()(digito())*) pontoVirgula()
+      id() atribuicao() id() operadorAritmetico() (id() | digito() (digito())*) pardir()
+      inicioBloco() (comandos())* fimBloco())
+    | (repWhile() paresq()(expressao()) pardir() inicioBloco() (comandos())* fimBloco())
+
+    }catch(ParseException e) {
+    consumeUntil(g,e,"repeticao");
+  }
+  
 }
 
 void funcao():
-{}
+{ RecoverySet g = Follow.funcao; }
 {
-	<FUNC> <PARESQ> ((<ID> | dado()) (<SEPARADOR> (<ID> | dado()))+) <PARDIR> <PONTOVIRGULA>
-}
+  try {
+    
+    func() paresq() ((id() | dado()) (separador() (id() | dado()))+) pardir() pontoVirgula()
+    
+    }catch(ParseException e) {
+    consumeUntil(g,e,"funcao");
+  }
+  
+  }
 
 void operacao():
-{ }
+{ RecoverySet g = Follow.operacao; }
 {
-	<ID> <ATRIBUICAO> expressao() <PONTOVIRGULA> 
+  try {
+
+    id() atribuicao() expressao() pontoVirgula()
+    
+  }catch(ParseException e) {
+    consumeUntil(g,e,"operacao");
+  }
 }
 
 void expressao():
-{ }
+{ RecoverySet g = Follow.expressao; }
 {
-	(<ID> | dado()) ((<OPERADOR_LOGICO>|<OPERADOR_ARITMETICO>) (<ID> | dado()))*
-| 	<PARESQ> expressao () <PARDIR>
+    try {
+
+    (id() | dado()) ((operadorLogico()|operadorAritmetico()) (id() | dado()))*
+    |   paresq() expressao () pardir()
+    
+    }catch(ParseException e) {
+    consumeUntil(g,e,"expressao");
+  } 
 }
 
 void declaracaoVariavel():
-{ }
+{ RecoverySet g = Follow.declaracaoVariavel; }
 {
-	tipoDado() <ID> (<ATRIBUICAO> dado())? (<SEPARADOR> (<ATRIBUICAO> dado()))* <PONTOVIRGULA>
+    try {
+      
+    tipoDado() id() (atribuicao() dado())? (separador() (atribuicao() dado()))* pontoVirgula()
+
+    }catch(ParseException e) {
+    consumeUntil(g,e,"declaracaoVariavel");
+  }
 }
 
 void tipoDado():
-{}
+{ }
 {
-	<INTEIRO> | <REAL> | <CHAR> | <STRING> | <BOOLEAN>
+  tipoInteiro() | tipoReal() | tipoChar() | tipoString() | tipoBooleano()
 }
 
 void dado():
-{ }
+{ RecoverySet g = Follow.dado; }
 {
-	numero() | string() | booleano()
+    try {
+
+        numero() | string() | booleano()
+      
+    }catch(ParseException e) {
+    consumeUntil(g,e,"dado");
+  }
 }
 
 void numero():
 { }
 {
-	(<DIGITO>)+ (<CASADECIMAL> (<DIGITO>)+ )?
+  (digito())+ (casaDecimal() (digito())+ )?
 }
 
 void string():
 { }
 {
-	(<ISTRING>)(<CARACTERE> | <DIGITO>)*(<ISTRING>)
+  (istring())(caractere() | digito())*(istring())
 }
 
 void booleano():
 { }
 {
-	<VERDADEIRO> | <FALSO>
+    verdadeiro() | falso()
+}
+
+void inicioPrograma() :
+{}
+{
+  < INICIOPROGRAMA >
+}
+
+void fimPrograma() :
+{}
+{
+  < FIMPROGRAMA >
+}
+
+void inicioBloco() :
+{}
+{
+  < INICIOBLOCO >
+}
+
+void fimBloco() :
+{}
+{
+  < FIMBLOCO >
+}
+
+void pontoVirgula() :
+{}
+{
+  < PONTOVIRGULA >
+}
+
+void tipoBooleano() :
+{}
+{
+  < BOOLEAN >
+}
+
+void tipoInteiro() :
+{}
+{
+  < INTEIRO >
+}
+
+void tipoReal() :
+{}
+{
+  < REAL >
+}
+
+void tipoChar() :
+{}
+{
+  < CHAR > 
+}
+
+void tipoString() :
+{}
+{
+  < STRING >
+}
+
+void atribuicao() :
+{}
+{
+  < ATRIBUICAO >
+}
+
+void separador() :
+{}
+{
+  < SEPARADOR >
+}
+
+void condicionalIf() :
+{}
+{
+  < IF >
+}
+
+void condicionalElse() :
+{}
+{
+  < ELSE >
+}
+
+void paresq() :
+{}
+{
+  < PARESQ >
+}
+
+void pardir() :
+{}
+{
+  < PARDIR >
+}
+
+void istring() :
+{}
+{
+  < ISTRING >
+}                               
+
+void casaDecimal() :
+{}
+{
+  < CASADECIMAL >
+}
+
+void operadorAritmetico() :
+{}
+{
+  < OPERADOR_ARITMETICO >
+}
+
+void operadorLogico() :
+{}
+{
+  < OPERADOR_LOGICO >
+}
+
+void repFor() :
+{}
+{
+  < FOR >
+}
+                          
+void repWhile() :
+{}
+{
+  < WHILE >
+}
+
+void func() :
+{}
+{
+  < FUNC >
+}
+
+void verdadeiro() :
+{}
+{
+  < VERDADEIRO >
+}
+
+void falso() :
+{}
+{
+  < FALSO >
+}
+
+void interrupcao() :
+{}
+{
+  < INTERRUPCAO >
+}
+
+void id() :
+{}
+{
+  < ID >
+}
+
+void digito() :
+{}
+{
+  < DIGITO >
+}
+
+void caractere() :
+{}
+{
+  < CARACTERE >
 }
