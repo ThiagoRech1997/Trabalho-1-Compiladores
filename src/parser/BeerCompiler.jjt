@@ -51,7 +51,7 @@ public class BeerCompiler
   // de sincronização
   static void consumeUntil(RecoverySet g,
 	                 ParseException e,
-	                 String met) throws ParseEOFException,
+	                 String met) throws ParseEOFException, 
 	                                    ParseException
   {
 	Token tok;
@@ -125,8 +125,8 @@ TOKEN :
 | < CARACTERE:				(["A"-"Z"] | ["a"-"z"]) 										>
 }
 
-void main():
-{ RecoverySet g = Follow.main; }
+SimpleNode main():
+{ RecoverySet sync= Follow.main; }
 {
   try { 
   inicioPrograma() inicioBloco()
@@ -136,13 +136,13 @@ void main():
   fimBloco() fimPrograma()
 
   } catch(ParseException e) {
-    consumeUntil(g,e,"main");
+    consumeUntil(sync,e,"main");
   }
   {return jjtThis; }
 }
 
 void comandos():
-{ RecoverySet g = Follow.comandos; }
+{ RecoverySet sync= Follow.comandos; }
 {
     try {
           declaracaoVariavel()
@@ -152,25 +152,25 @@ void comandos():
       |   operacao()
       
     }catch(ParseException e) {
-    consumeUntil(g,e,"comandos");
+    consumeUntil(sync,e,"comandos");
   }
 
 }
 
 void condicional():
-{ RecoverySet g = Follow.condicional; }
+{ RecoverySet sync= Follow.condicional; }
 {
   try {
 
       condicionalIf() paresq() expressao() pardir() inicioBloco() (comandos())* fimBloco() (condicionalElse() inicioBloco() (comandos())* fimBloco())?
       
     }catch(ParseException e) {
-    consumeUntil(g,e,"condicional");
+    consumeUntil(sync,e,"condicional");
   }
 }
 
 void repeticao():
-{ RecoverySet g = Follow.repeticao; }
+{ RecoverySet sync= Follow.repeticao; }
 {
   //(<FOR> <PARESQ> <ID> <IN> <ID> <PARDIR> <INICIOBLOCO>(comandos())*<FIMBLOCO>)
 
@@ -184,38 +184,38 @@ void repeticao():
     | (repWhile() paresq()(expressao()) pardir() inicioBloco() (comandos())* fimBloco())
 
     }catch(ParseException e) {
-    consumeUntil(g,e,"repeticao");
+    consumeUntil(sync,e,"repeticao");
   }
   
 }
 
 void funcao():
-{ RecoverySet g = Follow.funcao; }
+{ RecoverySet sync= Follow.funcao; }
 {
   try {
     
     func() paresq() ((id() | dado()) (separador() (id() | dado()))+) pardir() pontoVirgula()
     
     }catch(ParseException e) {
-    consumeUntil(g,e,"funcao");
+    consumeUntil(sync,e,"funcao"); 
   }
   
   }
 
 void operacao():
-{ RecoverySet g = Follow.operacao; }
+{ RecoverySet sync= Follow.operacao; }
 {
   try {
 
     id() atribuicao() expressao() pontoVirgula()
     
   }catch(ParseException e) {
-    consumeUntil(g,e,"operacao");
+    consumeUntil(sync,e,"operacao");
   }
 }
 
 void expressao():
-{ RecoverySet g = Follow.expressao; }
+{ RecoverySet sync= Follow.expressao; }
 {
     try {
 
@@ -223,56 +223,84 @@ void expressao():
     |   paresq() expressao () pardir()
     
     }catch(ParseException e) {
-    consumeUntil(g,e,"expressao");
+    consumeUntil(sync,e,"expressao");
   } 
 }
 
 void declaracaoVariavel():
-{ RecoverySet g = Follow.declaracaoVariavel; }
+{ RecoverySet sync= Follow.declaracaoVariavel; }
 {
     try {
       
     tipoDado() id() (atribuicao() dado())? (separador() (atribuicao() dado()))* pontoVirgula()
 
     }catch(ParseException e) {
-    consumeUntil(g,e,"declaracaoVariavel");
+    consumeUntil(sync,e,"declaracaoVariavel");
   }
 }
 
 void tipoDado():
-{ }
+{ RecoverySet sync= Follow.tipoDado; }
 {
-  tipoInteiro() | tipoReal() | tipoChar() | tipoString() | tipoBooleano()
+    try {
+      
+    	tipoInteiro() | tipoReal() | tipoChar() | tipoString() | tipoBooleano()
+
+    }catch(ParseException e) {
+    consumeUntil(sync,e,"tipoDado");
+  }
+  
 }
 
 void dado():
-{ RecoverySet g = Follow.dado; }
+{ RecoverySet sync= Follow.dado; }
 {
     try {
 
         numero() | string() | booleano()
       
     }catch(ParseException e) {
-    consumeUntil(g,e,"dado");
+    consumeUntil(sync,e,"dado");
   }
 }
 
 void numero():
-{ }
+{ RecoverySet sync= Follow.numero; }
 {
-  (digito())+ (casaDecimal() (digito())+ )?
+   try {
+
+        (digito())+ (casaDecimal() (digito())+ )?
+      
+    }catch(ParseException e) {
+    consumeUntil(sync,e,"numero");
+  }
+  
 }
 
 void string():
-{ }
+{ RecoverySet sync= Follow.string; }
 {
-  (istring())(caractere() | digito())*(istring())
+   try {
+
+        (istring())(caractere() | digito())*(istring())
+      
+    }catch(ParseException e) {
+    consumeUntil(sync,e,"string");
+  }
+  
 }
 
 void booleano():
-{ }
+{ RecoverySet sync= Follow.booleano; }
 {
-    verdadeiro() | falso()
+   try {
+
+        verdadeiro() | falso()
+      
+    }catch(ParseException e) {
+    consumeUntil(sync,e,"booleano");
+  }
+  
 }
 
 void inicioPrograma() :
