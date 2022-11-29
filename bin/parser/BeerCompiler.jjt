@@ -1,0 +1,593 @@
+options
+{
+  static = true;
+  DEBUG_PARSER = true;
+}
+
+PARSER_BEGIN(BeerCompiler)
+package parser;
+
+import recovery.*;
+import view.JanelaDoCompilador;
+import archives.CreateFile;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import javax.swing.JOptionPane;
+import java.io.FileWriter;
+import java.io.FileWriter;
+import javax.swing.JFileChooser;
+
+//graphviz : biblioteca para visualização de grafico
+// explicar as mudancas na linguagem.
+
+public class BeerCompiler
+{
+  final static JanelaDoCompilador janela = new JanelaDoCompilador();
+  static int linha;
+  
+  public static void main(String args []) throws ParseException
+  {
+	//Inicia a tela
+	janela.setVisible(true);
+	
+	janela.getCompilar().addActionListener(new ActionListener() {
+	public void actionPerformed(ActionEvent e) {
+		janela.erros.clear();
+		janela.setVazioConsoleMsg();
+
+		if((janela.getTextArquivo().getText().equals(janela.getCampoTexto())) != true)
+        {
+          janela.setControleArquivo(false);
+        }
+
+
+        if(janela.getControleArquivo() || janela.getTextArquivo().getText().equals(" ") )
+        {				
+			inicia();
+   		}else
+		{
+			if(janela.getTextArquivo().getText().equals(""))
+            {
+                JOptionPane.showMessageDialog (null, "A geladeira esta vazia (Arquivo vazio) ", "Arquivo", JOptionPane.WARNING_MESSAGE);
+            }else{
+              int resp = JOptionPane.showConfirmDialog(null, "Botar gelar meu patrão? (Salvar altera\u00e7\u00f5es?)");
+              
+          	  if(resp == 0)
+          	  {
+          	    //Salvar um novo arquivo se ele n existir
+          	    if(janela.getFile() == null)
+          	    {
+          	     	janela.salvarComo();
+					inicia();
+					
+          	    }else //Se o arquivo ja existir salvar nele
+          	    {
+          	      	janela.salvar();
+					inicia();
+          	    }
+          	  }
+          	}
+		}
+   	  }
+	});
+  }
+
+// funcao que le o arquivo e inicia a compilacao
+static void inicia(){
+  FileReader arql = null;
+    
+  try {
+	arql = new FileReader(janela.getFile());
+	
+  } catch (FileNotFoundException e2) {
+
+	e2.printStackTrace();
+  }
+  
+  BufferedReader arq = new BufferedReader(arql);
+
+  try {
+	BeerCompiler parser = new BeerCompiler(arq);
+
+  }catch (Exception e1){ 
+
+	BeerCompiler.ReInit(arq);
+
+  }catch (Error e1) { 
+
+   	BeerCompiler.ReInit(arq);
+  }
+   
+  try {
+    SimpleNode n = BeerCompiler.Start();
+   	n.dump("", janela);
+
+	}catch (Exception e1){
+
+	}catch (Error e1) {
+	}
+}
+  
+  static public String im(int x)
+  {
+    int k;
+	String s;
+    s = tokenImage[x];
+    k = s.lastIndexOf("\"");
+    try {
+      s = s.substring(1,k);
+    }
+   catch (StringIndexOutOfBoundsException e)
+	   {}
+   return s;
+  }
+	
+  static Token lastError = null;
+  static boolean eof;    // variável que indica se EOF foi alcançado
+	
+  // o método abaixo consome tokens até alcançar um que pertença ao conjunto
+  // de sincronização
+  static void consumeUntil(RecoverySet g,
+	                 ParseException e,
+	                 String met) throws ParseEOFException, 
+	                                    ParseException
+  {
+    eof=false;
+	Token tok;
+
+	janela.setConsole("*** " + met + " ***");
+	janela.setConsole("     Conjunto de sincronização: " + g);
+		
+	if (g == null) throw e; // se o conjunto é null, propaga a exceção 
+	
+	tok = getToken(1); // pega token corrente
+	while ( ! eof )	{ // se não chegou ao fim do arquivo
+	  if ( g.contains(tok.kind)) {//achou um token no conjunto
+	    janela.setConsole("     Encontrado token de sincronização: " + 
+	                       im(tok.kind));
+	    break;
+	  }
+	  janela.setConsole("     Ignorando o token: " + im(tok.kind));
+	  getNextToken();     // pega próximo token       
+      tok = getToken(1);
+	  if (tok.kind == EOF && ! g.contains(EOF) ) // fim da entrada?   
+	      eof = true;
+	}
+    if ( tok != lastError)  {
+      janela.MarcaLinhaErro(linha);
+	  janela.setConsole(e.getMessage());
+	  lastError = tok;
+	   
+	}
+	if ( eof )
+	  throw new ParseEOFException("Encontrei EOF onde não deveria.");
+  }
+}
+
+PARSER_END(BeerCompiler)
+
+SKIP :
+{
+  " " | "\r" | "\t" | "\n"
+}
+
+TOKEN :
+{
+  < INICIOPROGRAMA: 		"geladeiraAberta" 												>
+| < FIMPROGRAMA:			"geladeiraVazia" 												>
+| < INICIOBLOCO:			"{" 															>
+| < FIMBLOCO: 				"}"																>
+| < PONTOVIRGULA:			";" 															>
+| < INTEIRO: 				"pilsen" 														>
+| < REAL: 					"malzbier" 														>
+| < BOOLEAN:				"lager" 														>
+| < CHAR: 					"ipa" 															>
+| < STRING:					"helles"														>
+| < ATRIBUICAO:				"=" 												     		>
+| < SEPARADOR:				"," 															>
+| < IF:						"garrafa" 														> 
+| < ELSE:					"lata" 															>
+| < PARESQ: 				"(" 															>
+| < ISTRING:				"'" 															>
+| < PARDIR:					")" 															>
+| < CASADECIMAL:			"." 															>
+| < OPERADOR_ARITMETICO: 	"+" | "-" | "*" | "/" 											>
+| < OPERADOR_LOGICO:		">" | "<" | "<=" | ">=" | "<>" | "==" | "&" | "|" | "++" | "--"	> 
+| < FOR:					"rodizio" 														>
+| < IN:						"in" 															> 
+| < WHILE:					"rodada"														>
+| < FUNC:					"chop_"(<CARACTERE>|<DIGITO>)*									>
+| < VERDADEIRO:				"cervejaGelada" 												>
+| < FALSO:					"cervejaQuente" 												>
+| < INTERRUPCAO:			"chegaPorHoje"													>
+| < ID:						<CARACTERE>(["_"]|<CARACTERE >|<DIGITO>)*                       >
+| < DIGITO:					["0"-"9"] 														>
+| < CARACTERE:				(["A"-"Z"] | ["a"-"z"]) 										>
+}
+
+/* Substituido pelas duas funcoes abaixo:
+SimpleNode main():
+{ RecoverySet sync= Follow.main; }
+{
+  try { 
+  inicioPrograma() inicioBloco()
+  
+    (comandos())*
+  
+  fimBloco() fimPrograma()
+
+  } catch(ParseException e) {
+    consumeUntil(sync,e,"main");
+  }
+  {return jjtThis; }
+}
+*/
+
+SimpleNode Start() :
+{}
+{
+  main()
+  {
+    return jjtThis;
+  }
+}
+
+int main() :
+{
+  RecoverySet g = Follow.main;
+}
+{
+  try
+  {
+    inicioPrograma() inicioBloco() (comandos())* fimBloco() fimPrograma()
+  }
+  catch (ParseException e)
+  {
+    consumeUntil(g, e, "main");
+  }
+  {
+    return 0;
+  }
+}
+
+void comandos():
+{ RecoverySet sync= Follow.comandos; }
+{
+    try {
+          declaracaoVariavel()
+      |   condicional()  
+      |   repeticao()
+      |   funcao()
+      |   operacao()
+      
+    }catch(ParseException e) {
+    consumeUntil(sync,e,"comandos");
+  }
+
+}
+
+void condicional():
+{ RecoverySet sync= Follow.condicional; }
+{
+  try {
+
+      condicionalIf() paresq() expressao() pardir() inicioBloco() (comandos())* fimBloco() (condicionalElse() inicioBloco() (comandos())* fimBloco())?
+      
+    }catch(ParseException e) {
+    consumeUntil(sync,e,"condicional");
+  }
+}
+
+void repeticao():
+{ RecoverySet sync= Follow.repeticao; }
+{
+  //(<FOR> <PARESQ> <ID> <IN> <ID> <PARDIR> <INICIOBLOCO>(comandos())*<FIMBLOCO>)
+
+  try {
+
+    (repFor() paresq()
+      id() (atribuicao() digito()(digito())*)* pontoVirgula() 
+      id() operadorLogico() (id()|digito()(digito())*) pontoVirgula()
+      id() atribuicao() id() operadorAritmetico() (id() | digito() (digito())*) pardir()
+      inicioBloco() (comandos())* fimBloco())
+    | (repWhile() paresq()(expressao()) pardir() inicioBloco() (comandos())* fimBloco())
+
+    }catch(ParseException e) {
+    consumeUntil(sync,e,"repeticao");
+  }
+  
+}
+
+void funcao():
+{ RecoverySet sync= Follow.funcao; }
+{
+  try {
+    
+    func() paresq() ((id() | dado()) (separador() (id() | dado()))+) pardir() pontoVirgula()
+    
+    }catch(ParseException e) {
+    consumeUntil(sync,e,"funcao"); 
+  }
+  
+  }
+
+void operacao():
+{ RecoverySet sync= Follow.operacao; }
+{
+  try {
+
+    id() atribuicao() expressao() pontoVirgula()
+    
+  }catch(ParseException e) {
+    consumeUntil(sync,e,"operacao");
+  }
+}
+
+void expressao():
+{ RecoverySet sync= Follow.expressao; }
+{
+    try {
+
+    (id() | dado()) ((operadorLogico()|operadorAritmetico()) (id() | dado()))*
+    |   paresq() expressao () pardir()
+    
+    }catch(ParseException e) {
+    consumeUntil(sync,e,"expressao");
+  } 
+}
+
+void declaracaoVariavel():
+{ RecoverySet sync= Follow.declaracaoVariavel; }
+{
+    try {
+      
+    tipoDado() id() (atribuicao() dado())? (separador() (atribuicao() dado()))* pontoVirgula()
+
+    }catch(ParseException e) {
+    consumeUntil(sync,e,"declaracaoVariavel");
+  }
+}
+
+void tipoDado():
+{ RecoverySet sync= Follow.tipoDado; }
+{
+    try {
+      
+    	tipoInteiro() | tipoReal() | tipoChar() | tipoString() | tipoBooleano()
+
+    }catch(ParseException e) {
+    consumeUntil(sync,e,"tipoDado");
+  }
+  
+}
+
+void dado():
+{ RecoverySet sync= Follow.dado; }
+{
+    try {
+
+        numero() | string() | booleano()
+      
+    }catch(ParseException e) {
+    consumeUntil(sync,e,"dado");
+  }
+}
+
+void numero():
+{ RecoverySet sync= Follow.numero; }
+{
+   try {
+
+        (digito())+ (casaDecimal() (digito())+ )?
+      
+    }catch(ParseException e) {
+    consumeUntil(sync,e,"numero");
+  }
+  
+}
+
+void string():
+{ RecoverySet sync= Follow.string; }
+{
+   try {
+
+        (istring())(caractere() | digito())*(istring())
+      
+    }catch(ParseException e) {
+    consumeUntil(sync,e,"string");
+  }
+  
+}
+
+void booleano():
+{ RecoverySet sync= Follow.booleano; }
+{
+   try {
+
+        verdadeiro() | falso()
+      
+    }catch(ParseException e) {
+    consumeUntil(sync,e,"booleano");
+  }
+  
+}
+
+void inicioPrograma() :
+{}
+{
+  < INICIOPROGRAMA >
+}
+
+void fimPrograma() :
+{}
+{
+  < FIMPROGRAMA >
+}
+
+void inicioBloco() :
+{}
+{
+  < INICIOBLOCO >
+}
+
+void fimBloco() :
+{}
+{
+  < FIMBLOCO >
+}
+
+void pontoVirgula() :
+{}
+{
+  < PONTOVIRGULA >
+}
+
+void tipoBooleano() :
+{}
+{
+  < BOOLEAN >
+}
+
+void tipoInteiro() :
+{}
+{
+  < INTEIRO >
+}
+
+void tipoReal() :
+{}
+{
+  < REAL >
+}
+
+void tipoChar() :
+{}
+{
+  < CHAR > 
+}
+
+void tipoString() :
+{}
+{
+  < STRING >
+}
+
+void atribuicao() :
+{}
+{
+  < ATRIBUICAO >
+}
+
+void separador() :
+{}
+{
+  < SEPARADOR >
+}
+
+void condicionalIf() :
+{}
+{
+  < IF >
+}
+
+void condicionalElse() :
+{}
+{
+  < ELSE >
+}
+
+void paresq() :
+{}
+{
+  < PARESQ >
+}
+
+void pardir() :
+{}
+{
+  < PARDIR >
+}
+
+void istring() :
+{}
+{
+  < ISTRING >
+}                               
+
+void casaDecimal() :
+{}
+{
+  < CASADECIMAL >
+}
+
+void operadorAritmetico() :
+{}
+{
+  < OPERADOR_ARITMETICO >
+}
+
+void operadorLogico() :
+{}
+{
+  < OPERADOR_LOGICO >
+}
+
+void repFor() :
+{}
+{
+  < FOR >
+}
+                          
+void repWhile() :
+{}
+{
+  < WHILE >
+}
+
+void func() :
+{}
+{
+  < FUNC >
+}
+
+void verdadeiro() :
+{}
+{
+  < VERDADEIRO >
+}
+
+void falso() :
+{}
+{
+  < FALSO >
+}
+
+void interrupcao() :
+{}
+{
+  < INTERRUPCAO >
+}
+
+void id() :
+{}
+{
+  < ID >
+}
+
+void digito() :
+{}
+{
+  < DIGITO >
+}
+
+void caractere() :
+{}
+{
+  < CARACTERE >
+}
