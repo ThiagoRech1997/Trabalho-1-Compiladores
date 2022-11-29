@@ -1,34 +1,118 @@
+options
+{
+  static = true;
+  DEBUG_PARSER = true;
+}
+
 PARSER_BEGIN(BeerCompiler)
 package parser;
+
 import recovery.*;
+import view.JanelaDoCompilador;
+import archives.CreateFile;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import javax.swing.JOptionPane;
+import java.io.FileWriter;
+import java.io.FileWriter;
+import javax.swing.JFileChooser;
+
+//graphviz : biblioteca para visualização de grafico
+// explicar as mudancas na linguagem.
 
 public class BeerCompiler
 {
+  final static JanelaDoCompilador janela = new JanelaDoCompilador();
+  static int linha;
+  
   public static void main(String args []) throws ParseException
   {
-    BeerCompiler parser = new BeerCompiler(System.in);
-    System.out.println("A cervejaria esta aberta!");
-    while (true)
-    {
-      System.out.println("Vamos beber:");
-      try
-      {
-        parser.main();
-      }
-      catch (Exception e)
-      {
-        System.out.println("\n");
-        System.out.println(e.getMessage());
-        BeerCompiler.ReInit(System.in);
-      }
-      catch (Error e)
-      {
-        System.out.println("Parando de beber...");
-        System.out.println(e.getMessage());
-        break;
-      }
-    }
+	//Inicia a tela
+	janela.setVisible(true);
+	
+	janela.getCompilar().addActionListener(new ActionListener() {
+	public void actionPerformed(ActionEvent e) {
+		janela.erros.clear();
+		janela.setVazioConsoleMsg();
+
+		if((janela.getTextArquivo().getText().equals(janela.getCampoTexto())) != true)
+        {
+          janela.setControleArquivo(false);
+        }
+
+
+        if(janela.getControleArquivo() || janela.getTextArquivo().getText().equals(" ") )
+        {				
+			inicia();
+   		}else
+		{
+			if(janela.getTextArquivo().getText().equals(""))
+            {
+                JOptionPane.showMessageDialog (null, "A geladeira esta vazia (Arquivo vazio) ", "Arquivo", JOptionPane.WARNING_MESSAGE);
+            }else{
+              int resp = JOptionPane.showConfirmDialog(null, "Botar gelar meu patrão? (Salvar altera\u00e7\u00f5es?)");
+              
+          	  if(resp == 0)
+          	  {
+          	    //Salvar um novo arquivo se ele n existir
+          	    if(janela.getFile() == null)
+          	    {
+          	     	janela.salvarComo();
+					inicia();
+					
+          	    }else //Se o arquivo ja existir salvar nele
+          	    {
+          	      	janela.salvar();
+					inicia();
+          	    }
+          	  }
+          	}
+		}
+   	  }
+	});
   }
+
+// funcao que le o arquivo e inicia a compilacao
+static void inicia(){
+  FileReader arql = null;
+    
+  try {
+	arql = new FileReader(janela.getFile());
+	
+  } catch (FileNotFoundException e2) {
+
+	e2.printStackTrace();
+  }
+  
+  BufferedReader arq = new BufferedReader(arql);
+
+  try {
+	BeerCompiler parser = new BeerCompiler(arq);
+
+  }catch (Exception e1){ 
+
+	BeerCompiler.ReInit(arq);
+
+  }catch (Error e1) { 
+
+   	BeerCompiler.ReInit(arq);
+  }
+   
+  try {
+    SimpleNode n = BeerCompiler.Start();
+   	n.dump("", janela);
+
+	}catch (Exception e1){
+
+	}catch (Error e1) {
+	}
+}
   
   static public String im(int x)
   {
@@ -54,28 +138,30 @@ public class BeerCompiler
 	                 String met) throws ParseEOFException, 
 	                                    ParseException
   {
+    eof=false;
 	Token tok;
-	System.out.println();
-	System.out.println("*** " + met + " ***");
-	System.out.println("     Conjunto de sincronização: " + g);
+
+	janela.setConsole("*** " + met + " ***");
+	janela.setConsole("     Conjunto de sincronização: " + g);
 		
 	if (g == null) throw e; // se o conjunto é null, propaga a exceção 
 	
 	tok = getToken(1); // pega token corrente
 	while ( ! eof )	{ // se não chegou ao fim do arquivo
 	  if ( g.contains(tok.kind)) {//achou um token no conjunto
-	    System.out.println("     Encontrado token de sincronização: " + 
+	    janela.setConsole("     Encontrado token de sincronização: " + 
 	                       im(tok.kind));
 	    break;
 	  }
-	  System.out.println("     Ignorando o token: " + im(tok.kind));
+	  janela.setConsole("     Ignorando o token: " + im(tok.kind));
 	  getNextToken();     // pega próximo token       
       tok = getToken(1);
 	  if (tok.kind == EOF && ! g.contains(EOF) ) // fim da entrada?   
 	      eof = true;
 	}
     if ( tok != lastError)  {
-	  System.out.println(e.getMessage());
+      janela.MarcaLinhaErro(linha);
+	  janela.setConsole(e.getMessage());
 	  lastError = tok;
 	   
 	}
@@ -125,6 +211,7 @@ TOKEN :
 | < CARACTERE:				(["A"-"Z"] | ["a"-"z"]) 										>
 }
 
+/* Substituido pelas duas funcoes abaixo:
 SimpleNode main():
 { RecoverySet sync= Follow.main; }
 {
@@ -139,6 +226,34 @@ SimpleNode main():
     consumeUntil(sync,e,"main");
   }
   {return jjtThis; }
+}
+*/
+
+SimpleNode Start() :
+{}
+{
+  main()
+  {
+    return jjtThis;
+  }
+}
+
+int main() :
+{
+  RecoverySet g = Follow.main;
+}
+{
+  try
+  {
+    inicioPrograma() inicioBloco() (comandos())* fimBloco() fimPrograma()
+  }
+  catch (ParseException e)
+  {
+    consumeUntil(g, e, "main");
+  }
+  {
+    return 0;
+  }
 }
 
 void comandos():

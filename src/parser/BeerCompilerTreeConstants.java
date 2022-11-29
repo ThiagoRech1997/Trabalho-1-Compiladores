@@ -3,22 +3,53 @@ package parser;
 
 public interface BeerCompilerTreeConstants
 {
-  public int JJTMAIN = 0;
-  public int JJTCOMANDOS = 1;
-  public int JJTCONDICIONAL = 2;
-  public int JJTREPETICAO = 3;
-  public int JJTFUNCAO = 4;
-  public int JJTOPERACAO = 5;
-  public int JJTEXPRESSAO = 6;
-  public int JJTDECLARACAOVARIAVEL = 7;
-  public int JJTTIPODADO = 8;
-  public int JJTDADO = 9;
-  public int JJTNUMERO = 10;
-  public int JJTSTRING = 11;
-  public int JJTBOOLEANO = 12;
+  public int JJTSTART = 0;
+  public int JJTMAIN = 1;
+  public int JJTCOMANDOS = 2;
+  public int JJTCONDICIONAL = 3;
+  public int JJTREPETICAO = 4;
+  public int JJTFUNCAO = 5;
+  public int JJTOPERACAO = 6;
+  public int JJTEXPRESSAO = 7;
+  public int JJTDECLARACAOVARIAVEL = 8;
+  public int JJTTIPODADO = 9;
+  public int JJTDADO = 10;
+  public int JJTNUMERO = 11;
+  public int JJTSTRING = 12;
+  public int JJTBOOLEANO = 13;
+  public int JJTINICIOPROGRAMA = 14;
+  public int JJTFIMPROGRAMA = 15;
+  public int JJTINICIOBLOCO = 16;
+  public int JJTFIMBLOCO = 17;
+  public int JJTPONTOVIRGULA = 18;
+  public int JJTTIPOBOOLEANO = 19;
+  public int JJTTIPOINTEIRO = 20;
+  public int JJTTIPOREAL = 21;
+  public int JJTTIPOCHAR = 22;
+  public int JJTTIPOSTRING = 23;
+  public int JJTATRIBUICAO = 24;
+  public int JJTSEPARADOR = 25;
+  public int JJTCONDICIONALIF = 26;
+  public int JJTCONDICIONALELSE = 27;
+  public int JJTPARESQ = 28;
+  public int JJTPARDIR = 29;
+  public int JJTISTRING = 30;
+  public int JJTCASADECIMAL = 31;
+  public int JJTOPERADORARITMETICO = 32;
+  public int JJTOPERADORLOGICO = 33;
+  public int JJTREPFOR = 34;
+  public int JJTREPWHILE = 35;
+  public int JJTFUNC = 36;
+  public int JJTVERDADEIRO = 37;
+  public int JJTFALSO = 38;
+  public int JJTINTERRUPCAO = 39;
+  public int JJTID = 40;
+  public int JJTDIGITO = 41;
+  public int JJTCARACTERE = 42;
 
 
   public String[] jjtNodeName = {
+    "Start",
     "main",
     "comandos",
     "condicional",
@@ -32,6 +63,35 @@ public interface BeerCompilerTreeConstants
     "numero",
     "string",
     "booleano",
+    "inicioPrograma",
+    "fimPrograma",
+    "inicioBloco",
+    "fimBloco",
+    "pontoVirgula",
+    "tipoBooleano",
+    "tipoInteiro",
+    "tipoReal",
+    "tipoChar",
+    "tipoString",
+    "atribuicao",
+    "separador",
+    "condicionalIf",
+    "condicionalElse",
+    "paresq",
+    "pardir",
+    "istring",
+    "casaDecimal",
+    "operadorAritmetico",
+    "operadorLogico",
+    "repFor",
+    "repWhile",
+    "func",
+    "verdadeiro",
+    "falso",
+    "interrupcao",
+    "id",
+    "digito",
+    "caractere",
   };
 }
-/* JavaCC - OriginalChecksum=218e1aa8f74e22fbcc2737d6983120d8 (do not edit this line) */
+/* JavaCC - OriginalChecksum=a2f7134e47887c7254796f65f709de7f (do not edit this line) */

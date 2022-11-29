@@ -88,5 +88,7 @@ public class Follow { //implementa os conjuntos follow p/ os n.terminais
     	dado.add(new Integer(BeerCompilerConstants.OPERADOR_LOGICO));
     	dado.add(new Integer(BeerCompilerConstants.OPERADOR_ARITMETICO));
     	dado.add(new Integer(BeerCompilerConstants.PONTOVIRGULA));
+    	
+    	
     }
 }

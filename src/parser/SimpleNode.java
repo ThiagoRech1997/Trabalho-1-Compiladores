@@ -2,6 +2,8 @@
 /* JavaCCOptions:MULTI=false,NODE_USES_PARSER=false,VISITOR=false,TRACK_TOKENS=false,NODE_PREFIX=AST,NODE_EXTENDS=,NODE_FACTORY=,SUPPORT_CLASS_VISIBILITY_PUBLIC=true */
 package parser;
 
+import view.JanelaDoCompilador;
+
 public
 class SimpleNode implements Node {
 
@@ -63,13 +65,14 @@ class SimpleNode implements Node {
   /* Override this method if you want to customize how the node dumps
      out its children. */
 
-  public void dump(String prefix) {
-    System.out.println(toString(prefix));
+  public void dump(String prefix, JanelaDoCompilador janela) {
+	JanelaDoCompilador window = janela;
+	window.setMsg(toString(prefix)+"\n");
     if (children != null) {
       for (int i = 0; i < children.length; ++i) {
         SimpleNode n = (SimpleNode)children[i];
         if (n != null) {
-          n.dump(prefix + " ");
+          n.dump(prefix + " ", window);
         }
       }
     }
